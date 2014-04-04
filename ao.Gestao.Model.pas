@@ -147,6 +147,17 @@ const
     TFile.Delete(sArquivo);
   end;
 
+  procedure _ConectarGMail;
+  begin
+    Self.IdSMTP1.Host     := 'smtp.gmail.com';
+    Self.IdSMTP1.Port     := 587;
+    Self.IdSMTP1.AuthType := satDefault;
+    Self.IdSMTP1.UseTLS   := utUseRequireTLS;
+    Self.IdSMTP1.Username := 'aluno@arrayof.com.br';
+    Self.IdSMTP1.Password := 'aluno2014';
+    Self.IdSMTP1.Connect();
+  end;
+
   procedure _EnviarEmail(const ANomeAluno: string; AEMail: string);
 
     function _PrepararHTML: string;
@@ -180,20 +191,12 @@ const
     sArquivo  := ExtractFilePath(ParamStr(0)) + ANomeAluno + '_' + C_ARQUIVO;
     sArquivo  := ChangeFileExt(sArquivo, '.pdf');
     try
-      Self.IdSMTP1.Host     := 'smtp.gmail.com';
-      Self.IdSMTP1.Port     := 587;
-      Self.IdSMTP1.AuthType := satDefault;
-      Self.IdSMTP1.UseTLS   := utUseRequireTLS;
-      Self.IdSMTP1.Username := 'aluno@arrayof.com.br';
-      Self.IdSMTP1.Password := 'aluno2014';
-      Self.IdSMTP1.Connect();
 
       _mensagem.ContentType               := 'multipart/mixed';
       _mensagem.CharSet                   := 'ISO-8859-1';
       _mensagem.From.Address              := 'aluno@arrayof.com.br';
       _mensagem.From.Name                 := 'Central do Aluno - arrayOF Treinamento e Consultoria';
       _mensagem.Recipients.EMailAddresses := 'jmarioguedes@gmail.com'; // AEMail;
-      _mensagem.CCList.EMailAddresses     := 'mario.guedes@arrayof.com.br';
       _mensagem.Subject                   := 'Apostila do Curso [Versão 001]: ' + sCurso;
 
       _texto             := TidText.Create(_mensagem.MessageParts, nil);
@@ -204,13 +207,16 @@ const
       TIdAttachmentFile.Create(_mensagem.MessageParts, sArquivo);
 
       Self.IdSMTP1.Send(_mensagem);
-      Self.IdSMTP1.Disconnect(True);
 
       TFile.Delete(sArquivo);
-
     finally
       _mensagem.Free;
     end;
+  end;
+
+  procedure _DesconectarGMail;
+  begin
+    Self.IdSMTP1.Disconnect(True);
   end;
 
 var
@@ -218,6 +224,8 @@ var
 begin
   Self.cdsAluno.DisableControls;
   try
+    _ConectarGMail;
+
     aBook := Self.cdsAluno.GetBookmark;
 
     Self.cdsAluno.First;
@@ -239,6 +247,7 @@ begin
 
     Self.cdsAluno.GotoBookmark(aBook);
   finally
+    _DesconectarGMail;
     Self.cdsAluno.EnableControls;
   end;
 end;

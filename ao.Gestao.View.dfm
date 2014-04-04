@@ -81,6 +81,39 @@ object fGestao: TfGestao
         TabOrder = 1
       end
     end
+    object TabSheet2: TTabSheet
+      Caption = 'Convite e intru'#231#245'es - Grupos'
+      ImageIndex = 1
+      object Memo1: TMemo
+        Left = 0
+        Top = 0
+        Width = 840
+        Height = 435
+        Align = alClient
+        Lines.Strings = (
+          'Nome do grupo: turma999'
+          ''
+          '--'
+          ''
+          'Ol'#225'!'
+          ''
+          
+            'Estamos criando este grupo para facilitar a comunica'#231#227'o e fortal' +
+            'ecer a parceria entre a MORInfo e a arrayOF.'
+          ''
+          
+            'D'#250'vidas, coment'#225'rios, sugest'#245'es, corre'#231#245'es e qualquer outro assu' +
+            'nto relacionado ao treinamento "Criando Web Services de Alto Des' +
+            'empenho com Delphi e Python" poder'#225' '
+          'ser tratado por este canal.'
+          ''
+          'Sucesso a todos!'
+          ''
+          'M'#225'rio Guedes')
+        TabOrder = 0
+        ExplicitTop = -2
+      end
+    end
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -91,7 +124,7 @@ object fGestao: TfGestao
   end
   object dsAlunos: TDataSource
     DataSet = dmGestao.cdsAluno
-    Left = 112
-    Top = 232
+    Left = 392
+    Top = 8
   end
 end

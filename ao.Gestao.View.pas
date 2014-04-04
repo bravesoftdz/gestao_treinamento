@@ -30,6 +30,8 @@ type
     bGerarApostila: TButton;
     dsAlunos: TDataSource;
     Button1: TButton;
+    TabSheet2: TTabSheet;
+    Memo1: TMemo;
     procedure bGerarApostilaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -64,7 +66,6 @@ var
   sResultado: string;
 begin
   sResultado := dmGestao.ListagemEMail;
-  sResultado := sResultado + ', mario.guedes@arrayof.com.br, tamires.costa@arrayof.com.br';
   ShowMessage(sResultado);
 end;
 
