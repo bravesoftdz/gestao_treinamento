@@ -32,10 +32,11 @@ type
     IdSMTP1: TIdSMTP;
     IdSSLIOHandlerSocketOpenSSL1: TIdSSLIOHandlerSocketOpenSSL;
   private
-    { Private declarations }
+    FArquivoWord: string;
   public
-    procedure GerarApostilas;
+    procedure GerarApostilas(const AModoTeste: Boolean);
     function ListagemEMail: string;
+    property ArquivoWord: string read FArquivoWord write FArquivoWord;
   end;
 
 var
@@ -58,32 +59,31 @@ uses
 {$R *.dfm}
 { TdmGestao }
 
-procedure TdmGestao.GerarApostilas;
-const
-  C_ARQUIVO = 'Criando Web Services de Alto Desempenho com Delphi e Python.docx';
-  C_ORIGEM  =
-    'D:\Material jmarioguedes\arrayOF\apostilas\delphi\Criando Web Services de Alto desempenho com Delphi e Python\Criando Web Services de Alto Desempenho com Delphi e Python.docx';
-  C_DESTINO = '\' + C_ARQUIVO;
+procedure TdmGestao.GerarApostilas(const AModoTeste: Boolean);
+var
+  sDestino: string;
+  sOrigem : string;
+  sArquivo: string;
 
   procedure _DescompactarOriginal(const ANomeAluno: string);
   var
-    oZip    : TZipFile;
-    sArquivo: string;
+    oZip        : TZipFile;
+    sArquivoWord: string;
   begin
-    sArquivo := '.\' + ANomeAluno + C_DESTINO;
-    oZip     := TZipFile.Create;
+    sArquivoWord := '.\' + ANomeAluno + '_' + sArquivo;
+    oZip := TZipFile.Create;
     try
       TDirectory.CreateDirectory('.\' + ANomeAluno);
-      TFile.Copy(C_ORIGEM, sArquivo, True);
+      TFile.Copy(sOrigem, sArquivoWord, True);
 
-      oZip.Open(sArquivo, zmRead);
+      oZip.Open(sArquivoWord, zmRead);
       oZip.ExtractAll('.\' + ANomeAluno);
 
     finally
       oZip.Close;
       oZip.Free;
 
-      TFile.Delete(sArquivo);
+      TFile.Delete(sArquivoWord);
     end;
   end;
 
@@ -116,7 +116,7 @@ const
 
   procedure _CompactarNova(const ANomeAluno: string);
   begin
-    TZipFile.ZipDirectoryContents(ANomeAluno + '_' + C_ARQUIVO, '.\' + ANomeAluno);
+    TZipFile.ZipDirectoryContents(ANomeAluno + '_' + sArquivo, '.\' + ANomeAluno);
     TDirectory.Delete('.\' + ANomeAluno, True);
   end;
 
@@ -124,35 +124,35 @@ const
   const
     wdFormatPDF = 17;
   var
-    _msword    : Variant;
-    _documento : Variant;
-    _apostila  : Variant;
-    sArquivo   : string;
-    sArquivoPDF: string;
+    _msword     : Variant;
+    _documento  : Variant;
+    _apostila   : Variant;
+    sArquivoWord: string;
+    sArquivoPDF : string;
   begin
-    sArquivo := ExtractFilePath(ParamStr(0)) + ANomeAluno + '_' + C_ARQUIVO;
+    sArquivoWord := ExtractFilePath(ParamStr(0)) + ANomeAluno + '_' + sArquivo;
 
     _msword := CreateOleObject('Word.Application');
 
     _documento := _msword.Documents;
-    _apostila  := _documento.Open(ExtractFilePath(ParamStr(0)) + ANomeAluno + '_' + C_ARQUIVO);
+    _apostila := _documento.Open(sArquivoWord);
 
-    sArquivoPDF := ChangeFileExt(sArquivo, '.pdf');
+    sArquivoPDF := ChangeFileExt(sArquivoWord, '.pdf');
     _apostila.SaveAs2(FileName := sArquivoPDF, FileFormat := wdFormatPDF);
 
     _apostila.Close();
     _msword.Quit;
     _msword := Unassigned;
 
-    TFile.Delete(sArquivo);
+    TFile.Delete(sArquivoWord);
   end;
 
   procedure _ConectarGMail;
   begin
-    Self.IdSMTP1.Host     := 'smtp.gmail.com';
-    Self.IdSMTP1.Port     := 587;
+    Self.IdSMTP1.Host := 'smtp.gmail.com';
+    Self.IdSMTP1.Port := 587;
     Self.IdSMTP1.AuthType := satDefault;
-    Self.IdSMTP1.UseTLS   := utUseRequireTLS;
+    Self.IdSMTP1.UseTLS := utUseRequireTLS;
     Self.IdSMTP1.Username := 'aluno@arrayof.com.br';
     Self.IdSMTP1.Password := 'aluno2014';
     Self.IdSMTP1.Connect();
@@ -181,30 +181,35 @@ const
     end;
 
   var
-    _mensagem: TIdMessage;
-    _texto   : TidText;
-    sArquivo : string;
-    sCurso   : string;
+    _mensagem  : TIdMessage;
+    _texto     : TidText;
+    sArquivoPDF: string;
+    sCurso     : string;
   begin
     _mensagem := TIdMessage.Create(nil);
-    sCurso    := ChangeFileExt(C_ARQUIVO, '');
-    sArquivo  := ExtractFilePath(ParamStr(0)) + ANomeAluno + '_' + C_ARQUIVO;
-    sArquivo  := ChangeFileExt(sArquivo, '.pdf');
+    sCurso := ChangeFileExt(sArquivo, '');
+    sArquivoPDF := ExtractFilePath(ParamStr(0)) + ANomeAluno + '_' + sDestino;
     try
 
-      _mensagem.ContentType               := 'multipart/mixed';
-      _mensagem.CharSet                   := 'ISO-8859-1';
-      _mensagem.From.Address              := 'aluno@arrayof.com.br';
-      _mensagem.From.Name                 := 'Central do Aluno - arrayOF Treinamento e Consultoria';
-      _mensagem.Recipients.EMailAddresses := 'jmarioguedes@gmail.com'; // AEMail;
-      _mensagem.Subject                   := 'Apostila do Curso [Versão 001]: ' + sCurso;
+      _mensagem.ContentType := 'multipart/mixed';
+      _mensagem.CharSet := 'ISO-8859-1';
+      _mensagem.Subject := 'Apostila do Curso [Versão 001]: ' + sCurso;
+      _mensagem.From.Address := 'aluno@arrayof.com.br';
+      _mensagem.From.Name := 'Central do Aluno - arrayOF Treinamento e Consultoria';
 
-      _texto             := TidText.Create(_mensagem.MessageParts, nil);
+      if AModoTeste then
+      begin
+        _mensagem.Recipients.EMailAddresses := 'jmarioguedes@gmail.com';
+      end else begin
+        _mensagem.Recipients.EMailAddresses := AEMail;
+      end;
+
+      _texto := TidText.Create(_mensagem.MessageParts, nil);
       _texto.ContentType := 'text/html';
-      _texto.CharSet     := 'ISO-8859-1';
-      _texto.Body.Text   := Format(_PrepararHTML, [ANomeAluno, sCurso]);
+      _texto.CharSet := 'ISO-8859-1';
+      _texto.Body.Text := Format(_PrepararHTML, [ANomeAluno, sCurso]);
 
-      TIdAttachmentFile.Create(_mensagem.MessageParts, sArquivo);
+      TIdAttachmentFile.Create(_mensagem.MessageParts, sArquivoPDF);
 
       Self.IdSMTP1.Send(_mensagem);
 
@@ -224,6 +229,10 @@ var
 begin
   Self.cdsAluno.DisableControls;
   try
+    sOrigem := Self.FArquivoWord;
+    sArquivo := ExtractFileName(sOrigem);
+    sDestino := ChangeFileExt(sArquivo, '.pdf');
+
     _ConectarGMail;
 
     aBook := Self.cdsAluno.GetBookmark;
@@ -243,6 +252,11 @@ begin
       _EnviarEmail(Self.cdsAlunoNOME.AsString, Self.cdsAlunoEMAIL.AsString);
 
       Self.cdsAluno.Next;
+
+      if (AModoTeste) then
+      begin
+        Break;
+      end;
     end;
 
     Self.cdsAluno.GotoBookmark(aBook);
@@ -265,9 +279,7 @@ begin
       if Length(Result) = 0 then
       begin
         Result := Self.cdsAlunoEMAIL.AsString;
-      end
-      else
-      begin
+      end else begin
         Result := Result + ', ' + Self.cdsAlunoEMAIL.AsString;
       end;
 

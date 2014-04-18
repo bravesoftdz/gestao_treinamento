@@ -32,9 +32,15 @@ type
     Button1: TButton;
     TabSheet2: TTabSheet;
     Memo1: TMemo;
+    OpenDialog1: TOpenDialog;
+    Edit1: TEdit;
+    Button2: TButton;
+    CheckBox1: TCheckBox;
     procedure bGerarApostilaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Edit1Change(Sender: TObject);
   private
     { Private declarations }
   public
@@ -54,7 +60,7 @@ procedure TfGestao.bGerarApostilaClick(Sender: TObject);
 begin
   Screen.Cursor := crHourGlass;
   try
-    dmGestao.GerarApostilas;
+    dmGestao.GerarApostilas(Self.CheckBox1.Checked);
   finally
     Screen.Cursor := crDefault;
     MessageBox(Self.Handle, 'Processo finalizado!', 'Atenção!', MB_ICONINFORMATION);
@@ -67,6 +73,19 @@ var
 begin
   sResultado := dmGestao.ListagemEMail;
   ShowMessage(sResultado);
+end;
+
+procedure TfGestao.Button2Click(Sender: TObject);
+begin
+  if (Self.OpenDialog1.Execute(Self.Handle)) then
+  begin
+    Self.Edit1.Text := Self.OpenDialog1.FileName;
+  end;
+end;
+
+procedure TfGestao.Edit1Change(Sender: TObject);
+begin
+  dmGestao.ArquivoWord := Self.Edit1.Text;
 end;
 
 procedure TfGestao.FormCreate(Sender: TObject);

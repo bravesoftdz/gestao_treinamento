@@ -27,7 +27,7 @@ object fGestao: TfGestao
     TabOrder = 0
     object bGerarApostila: TButton
       Left = 16
-      Top = 16
+      Top = 58
       Width = 161
       Height = 25
       Caption = 'Gerar Apostilas'
@@ -36,12 +36,40 @@ object fGestao: TfGestao
     end
     object Button1: TButton
       Left = 183
-      Top = 16
+      Top = 58
       Width = 161
       Height = 25
       Caption = 'Lista de e-mails'
       TabOrder = 1
       OnClick = Button1Click
+    end
+    object Edit1: TEdit
+      Left = 97
+      Top = 17
+      Width = 624
+      Height = 21
+      TabOrder = 2
+      Text = 'Edit1'
+      OnChange = Edit1Change
+    end
+    object Button2: TButton
+      Left = 16
+      Top = 14
+      Width = 75
+      Height = 25
+      Caption = '&Abrir'
+      TabOrder = 3
+      OnClick = Button2Click
+    end
+    object CheckBox1: TCheckBox
+      Left = 368
+      Top = 62
+      Width = 97
+      Height = 17
+      Caption = 'Modo Teste'
+      Checked = True
+      State = cbChecked
+      TabOrder = 4
     end
   end
   object PageControl1: TPageControl
@@ -111,7 +139,6 @@ object fGestao: TfGestao
           ''
           'M'#225'rio Guedes')
         TabOrder = 0
-        ExplicitTop = -2
       end
     end
   end
@@ -124,7 +151,13 @@ object fGestao: TfGestao
   end
   object dsAlunos: TDataSource
     DataSet = dmGestao.cdsAluno
-    Left = 392
-    Top = 8
+    Left = 784
+    Top = 16
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'Arquivos do MSWord|*.docx'
+    Title = 'Selecionar arquivo ...'
+    Left = 128
+    Top = 208
   end
 end
